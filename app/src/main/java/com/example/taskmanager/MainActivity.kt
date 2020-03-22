@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
@@ -39,15 +40,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun generateFakeValues(): MutableList<String> {
-        val values = mutableListOf<String>()
-        for(i in 0..100){
-            values.add("$i element")
+    private fun generateFakeValues(): MutableList<Task> {
+        val values = mutableListOf<Task>()
+        for(i in 0..20){
+            values.add(Task("Title $i",
+                "RecyclerView.ItemAnimator will animate ViewGroup\n" +
+                    "modifications such as add/delete/select \n" +
+                    "that are notified to the adapter. DefaultItemAnimator can be used for basic default animations \n" +
+                    "and works quite well. See the section of this guide for more information." ,
+                Calendar.getInstance(),
+                listOf(true,false).random(),
+                listOf(Type.EMAIL, Type.MEETING, Type.PHONE, Type.QUARANTINE).random()))
         }
         return values
     }
 
-    class Adapter(private val values: List<String>): RecyclerView.Adapter<Adapter.ViewHolder>(){
+    class Adapter(private val values: List<Task>): RecyclerView.Adapter<Adapter.ViewHolder>(){
 
         override fun getItemCount() = values.size;
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Adapter.ViewHolder {
@@ -56,13 +64,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: Adapter.ViewHolder, position: Int) {
-            holder?.textView?.text = values[position]
+            //holder?.textView?.text = values[position].title
+            holder?.textView?.text = "//holder?.textView?.text "
         }
 
         class ViewHolder(itemView: View?): RecyclerView.ViewHolder(itemView!!) {
             var textView: TextView? = null;
             init{
-                // textView = itemView?.findViewById(R.id.list_item_textView)
+                 //textView = itemView?.findViewById(R.id.textView_title)
+                textView = itemView?.findViewById(R.id.textView_title)
             }
         }
 
