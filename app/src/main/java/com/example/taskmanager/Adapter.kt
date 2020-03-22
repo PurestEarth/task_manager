@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat
 
 
 class Adapter(
-    var values: List<Task>,
+    var values: MutableList<Task>,
     private val resources: Resources,
     private val recyclerView: RecyclerView,
     private val mainActivity: MainActivity

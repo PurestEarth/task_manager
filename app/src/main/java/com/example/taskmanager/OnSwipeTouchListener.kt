@@ -14,8 +14,8 @@ class OnSwipeTouchListener(
     private val recycle: RecyclerView
 ) : View.OnTouchListener {
     private val gestureDetector: GestureDetector
-    private val SWIPE_THRESHOLD = 30
-    private val SWIPE_VELOCITY_THRESHOLD = 50
+    private val SWIPE_THRESHOLD = 10
+    private val SWIPE_VELOCITY_THRESHOLD = 20
 
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         return gestureDetector.onTouchEvent(event)
@@ -78,22 +78,13 @@ class OnSwipeTouchListener(
     fun onSwipeRight(e: MotionEvent) {
         Log.i("BENIZ", "SWIPPED RIGHT")
         Log.i("BENIZ", getItemPosition(e.rawX, e.rawY).toString())
-        /*Log.i("BENIZ", childView.toString())
-        // adapter.values = listOf()
-        if (childView != null) {
-            Log.i("BENIZ", childView.id.toString())
-        }
-        */
+        adapter.values.removeAt(getItemPosition(e.rawX, e.rawY))
         adapter.notifyDataSetChanged()
         // todo remove that piece of shit
     }
     fun onSwipeLeft(e: MotionEvent) {
         Log.i("BENIZ", "SWIIIPED LEFT HEHE")
-        Log.i("BENIZ", getItemPosition(e.rawX, e.rawY).toString())
-        /*if (childView != null) {
-            Log.i("BENIZ", childView.id.toString())
-        }
-         */
+        adapter.values.get(getItemPosition(e.rawX, e.rawY)).done = true
         adapter.notifyDataSetChanged()
         // todo mark it as done
     }
@@ -103,9 +94,9 @@ class OnSwipeTouchListener(
     fun getItemPosition(x: Float, y:Float): Int{
         val child = recycle.findChildViewUnder(x, y)
         return if(child !== null){
-            recycle.getChildAdapterPosition(child)
+            recycle.getChildAdapterPosition(child) - 1
         } else{
-            adapter.values.size
+            adapter.values.size - 1
         }
     }
 
