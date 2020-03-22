@@ -2,16 +2,21 @@ package com.example.taskmanager
 
 import android.content.Context
 import android.util.Log
-import android.view.GestureDetector
-import android.view.MotionEvent
-import android.view.View
+import android.view.*
+import android.widget.ImageView
+import android.widget.PopupWindow
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import java.util.*
 import kotlin.math.abs
 
 class OnSwipeTouchListener(
     ctx: Context?,
     private val adapter: Adapter,
-    private val recycle: RecyclerView
+    private val recycle: RecyclerView,
+    private val context: Context,
+    private val view: View,
+    private val inflater: LayoutInflater
 ) : View.OnTouchListener {
     private val gestureDetector: GestureDetector
     private val SWIPE_THRESHOLD = 10
@@ -27,9 +32,8 @@ class OnSwipeTouchListener(
         }
 
         override  fun onSingleTapUp(e: MotionEvent?): Boolean {
-            Log.i("BENIZ", "Totally clciked")
             if (e != null) {
-                Log.i("BENIZ", getItemPosition(e.rawX, e.rawY).toString())
+                displayPopup(adapter.values[getItemPosition(e.rawX, e.rawY)])
             }
             return true
         }
@@ -40,7 +44,6 @@ class OnSwipeTouchListener(
             velocityX: Float,
             velocityY: Float
         ): Boolean {
-            Log.i("BENIZ", "WURST")
             var result = false
             try {
                 val diffY = e2.y - e1.y
@@ -76,17 +79,12 @@ class OnSwipeTouchListener(
     }
 
     fun onSwipeRight(e: MotionEvent) {
-        Log.i("BENIZ", "SWIPPED RIGHT")
-        Log.i("BENIZ", getItemPosition(e.rawX, e.rawY).toString())
         adapter.values.removeAt(getItemPosition(e.rawX, e.rawY))
         adapter.notifyDataSetChanged()
-        // todo remove that piece of shit
     }
     fun onSwipeLeft(e: MotionEvent) {
-        Log.i("BENIZ", "SWIIIPED LEFT HEHE")
         adapter.values.get(getItemPosition(e.rawX, e.rawY)).done = true
         adapter.notifyDataSetChanged()
-        // todo mark it as done
     }
     fun onSwipeTop() {}
     fun onSwipeBottom() {}
@@ -100,6 +98,30 @@ class OnSwipeTouchListener(
         }
     }
 
+    private fun displayPopup(tsk: Task){
+        val popupView = inflater.inflate(R.layout.popup, recycle, false)
+        val dm = context?.resources?.displayMetrics
+        val popupWindow = PopupWindow(popupView,
+            dm?.widthPixels?.times(0.8)?.toInt()!!,
+            dm?.heightPixels?.times(0.8)?.toInt()!!, true)
+        val popupTitle: TextView = popupView.findViewById(R.id.textView_popup_title)
+        val popupStatus: ImageView = popupView.findViewById(R.id.imageView_popup_status)
+        val popupType: ImageView = popupView.findViewById(R.id.imageView2_popup_type)
+        val popupDueDate: TextView = popupView.findViewById(R.id.textView3_popup_due)
+        val popupDescription: TextView = popupView.findViewById(R.id.textView2_popup_desc)
+
+        popupTitle.text = tsk.title
+        popupDueDate.text = adapter.form.format(tsk.dueDate.time)
+        popupDescription.text = tsk.description
+        popupStatus.setImageDrawable((if (tsk.done) adapter.resources.getDrawable(R.drawable.check) else adapter.resources.getDrawable(R.drawable.adv)))
+        popupType.setImageDrawable(adapter.resources.getDrawable(tsk.type.resourceId))
+
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0)
+        popupView.setOnTouchListener { _, _ ->
+            popupWindow.dismiss()
+            true
+        }
+    }
     init {
         gestureDetector = GestureDetector(ctx, GestureListener())
     }

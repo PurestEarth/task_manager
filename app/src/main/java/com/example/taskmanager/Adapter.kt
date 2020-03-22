@@ -1,5 +1,7 @@
 package com.example.taskmanager
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.Resources
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,9 +15,12 @@ import java.text.SimpleDateFormat
 
 class Adapter(
     var values: MutableList<Task>,
-    private val resources: Resources,
+    val resources: Resources,
     private val recyclerView: RecyclerView,
-    private val mainActivity: MainActivity
+    private val mainActivity: MainActivity,
+    private val context: Context,
+    private val view: View,
+    private val inflater: LayoutInflater
 ): RecyclerView.Adapter<Adapter.ViewHolder>(){
 
     override fun getItemCount() = values.size;
@@ -25,7 +30,7 @@ class Adapter(
         val itemView = LayoutInflater.from(parent?.context).inflate(R.layout.list_item, parent, false)
         val adapter = this
         fun <T : RecyclerView.ViewHolder> T.listen(event: (position: Int) -> Unit): T {
-            itemView.setOnTouchListener(OnSwipeTouchListener(mainActivity, adapter, recyclerView))
+            itemView.setOnTouchListener(OnSwipeTouchListener(mainActivity, adapter, recyclerView, context, view, inflater))
             return this
         }
         return ViewHolder(itemView).listen { pos ->
@@ -35,11 +40,9 @@ class Adapter(
 
     }
 
-
-
     override fun onBindViewHolder(holder: Adapter.ViewHolder, position: Int) {
         holder?.titleView?.text = values[position].title
-        holder?.descView?.text = values[position].description
+        holder?.descView?.text = values[position].description.take(20) + "..."
         holder?.dueView?.text = form.format(values[position].dueDate.time)
         holder?.statusView?.setImageDrawable((if (values[position].done) resources.getDrawable(R.drawable.check) else resources.getDrawable(R.drawable.adv)))
         holder?.typeView?.setImageDrawable(resources.getDrawable(values[position].type.resourceId))
