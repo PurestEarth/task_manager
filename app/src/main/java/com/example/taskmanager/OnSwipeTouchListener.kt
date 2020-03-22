@@ -5,11 +5,17 @@ import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
+import kotlin.math.abs
 
-class OnSwipeTouchListener(ctx: Context?) : View.OnTouchListener {
+class OnSwipeTouchListener(
+    ctx: Context?,
+    private val adapter: Adapter,
+    private val recycle: RecyclerView
+) : View.OnTouchListener {
     private val gestureDetector: GestureDetector
-    private val SWIPE_THRESHOLD = 100
-    private val SWIPE_VELOCITY_THRESHOLD = 100
+    private val SWIPE_THRESHOLD = 30
+    private val SWIPE_VELOCITY_THRESHOLD = 50
 
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         return gestureDetector.onTouchEvent(event)
@@ -17,6 +23,14 @@ class OnSwipeTouchListener(ctx: Context?) : View.OnTouchListener {
 
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onDown(e: MotionEvent): Boolean {
+            return true
+        }
+
+        override  fun onSingleTapUp(e: MotionEvent?): Boolean {
+            Log.i("BENIZ", "Totally clciked")
+            if (e != null) {
+                Log.i("BENIZ", getItemPosition(e.rawX, e.rawY).toString())
+            }
             return true
         }
 
@@ -31,19 +45,19 @@ class OnSwipeTouchListener(ctx: Context?) : View.OnTouchListener {
             try {
                 val diffY = e2.y - e1.y
                 val diffX = e2.x - e1.x
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(
+                if (abs(diffX) > abs(diffY)) {
+                    if (abs(diffX) > SWIPE_THRESHOLD && Math.abs(
                             velocityX
                         ) > SWIPE_VELOCITY_THRESHOLD
                     ) {
                         if (diffX > 0) {
-                            onSwipeRight()
+                            onSwipeRight(e1)
                         } else {
-                            onSwipeLeft()
+                            onSwipeLeft(e2)
                         }
                         result = true
                     }
-                } else if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(
+                } else if (abs(diffY) > SWIPE_THRESHOLD && Math.abs(
                         velocityY
                     ) > SWIPE_VELOCITY_THRESHOLD
                 ) {
@@ -57,20 +71,43 @@ class OnSwipeTouchListener(ctx: Context?) : View.OnTouchListener {
             } catch (exception: Exception) {
                 exception.printStackTrace()
             }
-            return result
+            return true
         }
     }
 
-    fun onSwipeRight() {
-        Log.i("BENIZ", "SWIIIPED RIGHT")
+    fun onSwipeRight(e: MotionEvent) {
+        Log.i("BENIZ", "SWIPPED RIGHT")
+        Log.i("BENIZ", getItemPosition(e.rawX, e.rawY).toString())
+        /*Log.i("BENIZ", childView.toString())
+        // adapter.values = listOf()
+        if (childView != null) {
+            Log.i("BENIZ", childView.id.toString())
+        }
+        */
+        adapter.notifyDataSetChanged()
         // todo remove that piece of shit
     }
-    fun onSwipeLeft() {
+    fun onSwipeLeft(e: MotionEvent) {
         Log.i("BENIZ", "SWIIIPED LEFT HEHE")
+        Log.i("BENIZ", getItemPosition(e.rawX, e.rawY).toString())
+        /*if (childView != null) {
+            Log.i("BENIZ", childView.id.toString())
+        }
+         */
+        adapter.notifyDataSetChanged()
         // todo mark it as done
     }
     fun onSwipeTop() {}
     fun onSwipeBottom() {}
+
+    fun getItemPosition(x: Float, y:Float): Int{
+        val child = recycle.findChildViewUnder(x, y)
+        return if(child !== null){
+            recycle.getChildAdapterPosition(child)
+        } else{
+            adapter.values.size
+        }
+    }
 
     init {
         gestureDetector = GestureDetector(ctx, GestureListener())

@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         recyclerView =
             findViewById<RecyclerView>(R.id.recycler)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = Adapter(tasks, resources, this)
+        recyclerView.adapter = Adapter(tasks, resources, recyclerView, this)
         toolbar.overflowIcon = ContextCompat.getDrawable(applicationContext,android.R.drawable.ic_input_add)
     }
 

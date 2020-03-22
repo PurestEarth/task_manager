@@ -12,8 +12,9 @@ import java.text.SimpleDateFormat
 
 
 class Adapter(
-    private val values: List<Task>,
+    var values: List<Task>,
     private val resources: Resources,
+    private val recyclerView: RecyclerView,
     private val mainActivity: MainActivity
 ): RecyclerView.Adapter<Adapter.ViewHolder>(){
 
@@ -22,20 +23,19 @@ class Adapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Adapter.ViewHolder {
         val itemView = LayoutInflater.from(parent?.context).inflate(R.layout.list_item, parent, false)
-        itemView.setOnTouchListener(OnSwipeTouchListener(mainActivity))
-        return ViewHolder(itemView).listen { pos, type ->
-            Log.i("BENIZ", pos.toString())
-            Log.i("BENIZ", "KARRRAMBA")
-            //todo
+        val adapter = this
+        fun <T : RecyclerView.ViewHolder> T.listen(event: (position: Int) -> Unit): T {
+            itemView.setOnTouchListener(OnSwipeTouchListener(mainActivity, adapter, recyclerView))
+            return this
         }
+        return ViewHolder(itemView).listen { pos ->
+            Log.i("BENIZ3", pos.toString())
+            //todo open closeup
+        }
+
     }
 
-    fun <T : RecyclerView.ViewHolder> T.listen(event: (position: Int, type: Int) -> Unit): T {
-        itemView.setOnClickListener {
-            event.invoke(getAdapterPosition(), getItemViewType())
-        }
-        return this
-    }
+
 
     override fun onBindViewHolder(holder: Adapter.ViewHolder, position: Int) {
         holder?.titleView?.text = values[position].title
