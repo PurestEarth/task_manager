@@ -19,8 +19,8 @@ class OnSwipeTouchListener(
     private val inflater: LayoutInflater
 ) : View.OnTouchListener {
     private val gestureDetector: GestureDetector
-    private val SWIPE_THRESHOLD = 10
-    private val SWIPE_VELOCITY_THRESHOLD = 20
+    private val SWIPE_THRESHOLD = 1
+    private val SWIPE_VELOCITY_THRESHOLD = 10
 
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         return gestureDetector.onTouchEvent(event)
