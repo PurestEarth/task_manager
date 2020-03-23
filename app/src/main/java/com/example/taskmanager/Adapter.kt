@@ -34,15 +34,14 @@ class Adapter(
             return this
         }
         return ViewHolder(itemView).listen { pos ->
-            Log.i("BENIZ3", pos.toString())
-            //todo open closeup
+
         }
 
     }
 
     override fun onBindViewHolder(holder: Adapter.ViewHolder, position: Int) {
         holder?.titleView?.text = values[position].title
-        holder?.descView?.text = values[position].description.take(20) + "..."
+        holder?.descView?.text = values[position].description.take(20) + (if (values[position].description.length > 20) "..."  else "")
         holder?.dueView?.text = form.format(values[position].dueDate.time)
         holder?.statusView?.setImageDrawable((if (values[position].done) resources.getDrawable(R.drawable.check) else resources.getDrawable(R.drawable.adv)))
         holder?.typeView?.setImageDrawable(resources.getDrawable(values[position].type.resourceId))
